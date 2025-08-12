@@ -7,7 +7,7 @@ data = pd.read_csv("C:\\Users\\Arrcann\\Documents\\RapidMiner\\Titanic-Dataset (
 
 # Clean the data
 data.isnull().sum()
-data.drop_duplicaes()
+data.drop_duplicates()
 
 # Summary statistics
 data.describe()
