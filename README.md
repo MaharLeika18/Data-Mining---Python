@@ -1,5 +1,6 @@
 # Data-Mining---Python
 Repo for various data mining projects utilizing Python. Collaborative. 
+Run the installRequirements.bat file to install all the modules needed to run the program.
 
 # Decision Tree (For future use, ignore)
 features = ["Sex", "Family", "IsAlone", "Fare", "Embarked", "Age", "Pclass"]
