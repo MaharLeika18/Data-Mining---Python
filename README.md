@@ -1,20 +1,8 @@
 # Data-Mining---Python
-Repo for various data mining projects utilizing Python. Collaborative. 
-Run the installRequirements.bat file to install all the modules needed to run the program.
+Repo for any and all data mining projects we create using Python & other data mining tools. Collaborative. Will also act as a repo for storing data analysis results using external tools like Tableau or MS Power BI.
 
-# Decision Tree (For future use, ignore)
-features = ["Sex", "Family", "IsAlone", "Fare", "Embarked", "Age", "Pclass"]
+Certain projects should be identifiable by the name of their folder and contain a description in a README file for easier navigation and distinction. 
 
-x = data[features]
-y = data["Survived"]
+Run the installRequirements.bat file when included in a projects folder to install all the modules needed to run the relevant program.
 
-dtree = DecisionTreeClassifier(max_depth=5, random_state=42)
-dtree = dtree.fit(x, y)
 
-plt.figure(figsize=(20, 10))
-tree.plot_tree(
-    dtree, feature_names=features, class_names=["Died", "Survived"], filled=True, rounded=True, fontsize=10,
-    impurity=False, proportion=True, label="none"
-) 
-
-plt.show()
