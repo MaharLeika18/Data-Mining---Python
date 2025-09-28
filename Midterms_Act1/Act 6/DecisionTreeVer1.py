@@ -5,6 +5,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier, plot_tree
 import matplotlib.pyplot as plt 
 import textwrap
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.preprocessing import StandardScaler
 
 # Function to import the dataset
 def importdata():
@@ -19,7 +21,7 @@ def importdata():
     return data
 
 # Data preprocessing
-def splitdataset(data):
+def splitdataset(data, scale_for_knn=True):
     # Drop irrelevant columns (not useful for prediction)
     data = data.drop("customerID", axis=1)
     data = data.drop("gender", axis=1)
@@ -44,8 +46,15 @@ def splitdataset(data):
         X, Y, test_size=0.3, random_state=100, stratify=Y
     )
 
+    # Scale features for KNN but not for Decision Tree
+    if scale_for_knn:   
+        scaler = StandardScaler()
+        X_train = scaler.fit_transform(X_train)
+        X_test = scaler.transform(X_test)
+
     return X, Y, X_train, X_test, y_train, y_test
 
+# Functions for training, predicting, and assessing decision tree algo
 def train_using_gini(X_train, y_train):
     # Creating the classifier object (Experiment w/ vars for desired result)
     clf_gini = DecisionTreeClassifier(
@@ -79,10 +88,17 @@ def prediction(X_test, clf_object):
     print(y_pred)
     return y_pred
 
-def cal_accuracy(y_test, y_pred):
+def cal_accuracy(y_test, y_pred, model_name="Model"):
+    print(f"\n{model_name}")
     print("\nConfusion Matrix:\n", confusion_matrix(y_test, y_pred))
     print("Accuracy:", accuracy_score(y_test, y_pred)*100)
     print("Classification Report:\n", classification_report(y_test, y_pred))
+
+# Function for KNN training
+def train_knn(X_train, y_train, n_neighbors=5):  
+    knn = KNeighborsClassifier(n_neighbors=n_neighbors)
+    knn.fit(X_train, y_train)
+    return knn
 
 # Function to plot the decision tree
 def plot_decision_tree(clf_object, feature_names, class_names, max_width=15):
@@ -115,13 +131,11 @@ if __name__ == "__main__":
     clf_entropy = train_using_entropy(X_train, y_train)
 
     # Predictions
-    print("\nGini Model:")
     y_pred_gini = prediction(X_test, clf_gini)
-    cal_accuracy(y_test, y_pred_gini)
+    cal_accuracy(y_test, y_pred_gini, "\n\t\tGini Model:")
 
-    print("\nEntropy Model:")
     y_pred_entropy = prediction(X_test, clf_entropy)
-    cal_accuracy(y_test, y_pred_entropy)
+    cal_accuracy(y_test, y_pred_entropy, "\n\t\tEntropy Model:")
 
     # Visualizing the Decision Trees using auto-tuning pruning
     path = clf_gini.cost_complexity_pruning_path(X_train, y_train)
@@ -142,9 +156,16 @@ if __name__ == "__main__":
 
     clf_pruned = train_with_pruning(X_train, y_train, ccp_alpha=best_alpha)
     y_pred_pruned = prediction(X_test, clf_pruned)
-    print("\n--- Pruned Model ---")  
-    cal_accuracy(y_test, y_pred_pruned)
+    cal_accuracy(y_test, y_pred_pruned, "\n\t\tDecision Tree (Pruned)")
 
+    # Visualize KNN
+    _, _, X_train_knn, X_test_knn, y_train, y_test = splitdataset(data, scale_for_knn=True)
+    clf_knn = train_knn(X_train_knn, y_train, n_neighbors=5)
+
+    y_pred_knn = prediction(X_test_knn, clf_knn)
+    cal_accuracy(y_test, y_pred_knn, "\n\t\t      KNN Algorithm")
+
+    # Plot pruned decision tree
     plot_decision_tree(clf_gini, X.columns, ["No Churn", "Churn"])
     plot_decision_tree(clf_entropy, X.columns, ["No Churn", "Churn"])
     plot_decision_tree(clf_pruned, X.columns, ["No Churn", "Churn"])
