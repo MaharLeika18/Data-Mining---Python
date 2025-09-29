@@ -6,7 +6,7 @@ from sklearn.tree import DecisionTreeClassifier, plot_tree
 import matplotlib.pyplot as plt 
 import textwrap
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import Normalizer
 
 # Function to import the dataset
 def importdata():
@@ -21,7 +21,7 @@ def importdata():
     return data
 
 # Data preprocessing
-def splitdataset(data, scale_for_knn=True):
+def splitdataset(data, norm_for_knn=True):
     # Drop irrelevant columns (not useful for prediction)
     data = data.drop("customerID", axis=1)
     data = data.drop("gender", axis=1)
@@ -46,11 +46,11 @@ def splitdataset(data, scale_for_knn=True):
         X, Y, test_size=0.3, random_state=100, stratify=Y
     )
 
-    # Scale features for KNN but not for Decision Tree
-    if scale_for_knn:   
-        scaler = StandardScaler()
-        X_train = scaler.fit_transform(X_train)
-        X_test = scaler.transform(X_test)
+    # Normalize features for KNN but not for Decision Tree
+    if norm_for_knn:   
+        normalizer = Normalizer()
+        X_train = normalizer.fit_transform(X_train)
+        X_test = normalizer.transform(X_test)
 
     return X, Y, X_train, X_test, y_train, y_test
 
@@ -94,11 +94,28 @@ def cal_accuracy(y_test, y_pred, model_name="Model"):
     print("Accuracy:", accuracy_score(y_test, y_pred)*100)
     print("Classification Report:\n", classification_report(y_test, y_pred))
 
-# Function for KNN training
+# Function for KNN training + plotting
 def train_knn(X_train, y_train, n_neighbors=5):  
     knn = KNeighborsClassifier(n_neighbors=n_neighbors)
     knn.fit(X_train, y_train)
     return knn
+
+def plot_knn_accuracy(X_train, X_test, y_train, y_test, k_range=range(1, 21)):
+    accuracies = []
+    for k in k_range:
+        knn = KNeighborsClassifier(n_neighbors=k)
+        knn.fit(X_train, y_train)
+        acc = knn.score(X_test, y_test)
+        accuracies.append(acc)
+    
+    plt.figure(figsize=(10, 6))
+    plt.plot(k_range, accuracies, marker='o')
+    plt.title("KNN Accuracy vs. Number of Neighbors (k)")
+    plt.xlabel("Number of Neighbors (k)")
+    plt.ylabel("Accuracy")
+    plt.xticks(k_range)
+    plt.grid(True)
+    plt.show()
 
 # Function to plot the decision tree
 def plot_decision_tree(clf_object, feature_names, class_names, max_width=15):
@@ -150,22 +167,24 @@ if __name__ == "__main__":
         if acc > best_acc:
             best_acc = acc
             best_alpha = alpha
-        print(f"Alpha={alpha:.5f}, Test Accuracy={acc:.3f}")
-
-    print(f"\nBest alpha: {best_alpha:.5f} with Test Accuracy={best_acc:.3f}")
 
     clf_pruned = train_with_pruning(X_train, y_train, ccp_alpha=best_alpha)
     y_pred_pruned = prediction(X_test, clf_pruned)
     cal_accuracy(y_test, y_pred_pruned, "\n\t\tDecision Tree (Pruned)")
 
     # Visualize KNN
-    _, _, X_train_knn, X_test_knn, y_train, y_test = splitdataset(data, scale_for_knn=True)
+    _, _, X_train_knn, X_test_knn, y_train_knn, y_test_knn = splitdataset(data, scale_for_knn=True)
     clf_knn = train_knn(X_train_knn, y_train, n_neighbors=5)
 
     y_pred_knn = prediction(X_test_knn, clf_knn)
     cal_accuracy(y_test, y_pred_knn, "\n\t\t      KNN Algorithm")
 
-    # Plot pruned decision tree
+    # Plot decision trees
     plot_decision_tree(clf_gini, X.columns, ["No Churn", "Churn"])
     plot_decision_tree(clf_entropy, X.columns, ["No Churn", "Churn"])
     plot_decision_tree(clf_pruned, X.columns, ["No Churn", "Churn"])
+
+    # Plot KNN accuracy vs. k
+    plot_knn_accuracy(X_train_knn, X_test_knn, y_train_knn, y_test_knn)
+
+
