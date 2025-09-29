@@ -49,7 +49,7 @@
       <operator activated="true" class="concurrency:cross_validation" compatibility="12.0.001" expanded="true" height="145" name="Tree CV" width="90" x="380" y="238">
         <parameter key="split_on_batch_attribute" value="false"/>
         <parameter key="leave_one_out" value="false"/>
-        <parameter key="number_of_folds" value="2"/>
+        <parameter key="number_of_folds" value="10"/>
         <parameter key="sampling_type" value="stratified sampling"/>
         <parameter key="use_local_random_seed" value="true"/>
         <parameter key="local_random_seed" value="1992"/>
@@ -122,13 +122,13 @@
       <operator activated="true" class="concurrency:cross_validation" compatibility="12.0.001" expanded="true" height="145" name="k-NN CV" width="90" x="380" y="34">
         <parameter key="split_on_batch_attribute" value="false"/>
         <parameter key="leave_one_out" value="false"/>
-        <parameter key="number_of_folds" value="2"/>
+        <parameter key="number_of_folds" value="10"/>
         <parameter key="sampling_type" value="stratified sampling"/>
         <parameter key="use_local_random_seed" value="true"/>
         <parameter key="local_random_seed" value="1992"/>
         <parameter key="enable_parallel_execution" value="true"/>
         <process expanded="true">
-          <operator activated="true" class="k_nn" compatibility="12.0.001" expanded="true" height="82" name="k-NN" width="90" x="179" y="34">
+          <operator activated="true" class="k_nn" compatibility="12.0.001" expanded="true" height="82" name="k-NN" width="90" x="112" y="34">
             <parameter key="k" value="5"/>
             <parameter key="weighted_vote" value="true"/>
             <parameter key="measure_types" value="MixedMeasures"/>
